@@ -11,7 +11,7 @@ from apps.services.auth.authInterface import AuthInterface
 
 class AuthService(AuthInterface):
 
-    def register(self, data):
+    def register_account(self, data):
         try:
             if User.objects(email=data['email']).first():
                 return jsonify({f"status": "error", "message": "This account is already registered"}), 400

@@ -32,7 +32,7 @@ class TestAuthService(TestCase):
     def test_that_registration_works_return_count_of_one(self):
         auth_service = AuthService()
         data = {"email": "test_email@gmail.com"}
-        response, status = auth_service.register(data)
+        response, status = auth_service.register_account(data)
         response_json = response.get_json()
 
         assert status == 200
@@ -43,7 +43,7 @@ class TestAuthService(TestCase):
     def test_that_an_already_registered_account_cannot_register_twice(self):
         auth_service = AuthService()
         data = {"email": "test_email@gmail.com"}
-        response, status = auth_service.register(data)
+        response, status = auth_service.register_account(data)
         response_json = response.get_json()
 
         assert status == 200
@@ -51,7 +51,7 @@ class TestAuthService(TestCase):
         assert response_json['message'] == 'test_email@gmail.com registered successfully'
 
         data2 = {"email": "test_email@gmail.com"}
-        response, status = auth_service.register(data2)
+        response, status = auth_service.register_account(data2)
         response_json = response.get_json()
 
         assert status == 400
@@ -62,7 +62,7 @@ class TestAuthService(TestCase):
     def test_that_login_function_status_returns_200(self):
         auth_service = AuthService()
         data = {"email": "test_email@gmail.com"}
-        response, status = auth_service.register(data)
+        response, status = auth_service.register_account(data)
         response_json = response.get_json()
 
         assert status == 200
@@ -70,7 +70,7 @@ class TestAuthService(TestCase):
         assert response_json['message'] == 'test_email@gmail.com registered successfully'
 
         data2 = {"email": "test_email@gmail.com"}
-        response, status = auth_service.register(data2)
+        response, status = auth_service.register_account(data2)
         response_json = response.get_json()
 
         assert status == 400

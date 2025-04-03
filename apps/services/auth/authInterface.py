@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 class AuthInterface(ABC):
 
     @abstractmethod
-    def register(self, data):
+    def register_account(self, data):
         pass
 
     @abstractmethod

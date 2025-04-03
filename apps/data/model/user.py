@@ -7,7 +7,8 @@ from apps.data.model.status import AccountStatus
 
 class User(Document):
     email = EmailField(required=True, unique=True)
-    custom_categories = ListField(StringField())
+    custom_categories = ListField(StringField(), default=[])
     role=StringField(choices=['admin','user'], default='user')
     status=EnumField(AccountStatus, default=AccountStatus.ACTIVE)
     created_at = DateTimeField(default=datetime.now)
+

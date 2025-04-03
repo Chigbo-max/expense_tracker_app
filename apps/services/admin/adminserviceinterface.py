@@ -18,3 +18,11 @@ class AdminServiceInterface(ABC):
     @abstractmethod
     def view_all_users(self, data):
         pass
+
+    @abstractmethod
+    def add_default_categories(self, data):
+        pass
+
+    @abstractmethod
+    def remove_default_categories(self, data):
+        pass
