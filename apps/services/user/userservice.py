@@ -5,6 +5,7 @@ from flask import jsonify
 
 from apps.data.model.budget import Budget
 from apps.data.model.defaultcategories import DefaultCategories
+from apps.data.model.expenses import Expenses
 from apps.data.model.user import User
 from apps.services.user.userserviceinterface import UserServiceInterface
 
@@ -13,7 +14,6 @@ class UserService(UserServiceInterface):
     def create_budget(self, user_identity, data):
         try:
             email = user_identity
-            print("found email:" , email)
 
             if not email:
                 return jsonify({
@@ -23,13 +23,10 @@ class UserService(UserServiceInterface):
 
             user = User.objects(email=email).first()
 
-            print("user found: ", user.email)
 
             default_categories =[category.name for category in DefaultCategories.objects()]
-            print("default categories: ", default_categories)
 
             valid_categories =  default_categories + user.custom_categories
-            print("valid_categories: ", valid_categories)
 
             if data['category'] not in valid_categories:
                 return jsonify({
@@ -66,12 +63,92 @@ class UserService(UserServiceInterface):
 
 
 
-
     def create_expenses(self, user_identity, data):
-        pass
+        email = user_identity
+
+        if not email:
+            return jsonify({
+                'status': 'error',
+                'message': 'Not authorized to access this service'
+            }), 400
+        try:
+            user = User.objects(email=email).first()
+
+            amount = data['amount']
+            category = data['category']
+            merchant = data['merchant']
+            description = data['description']
+            recipient = data['recipient']
+            date = datetime.strptime(data['date'], '%Y-%m-%d')
+
+            new_expense_entry = Expenses(
+                user=user,
+                amount = amount,
+                category = category,
+                merchant = merchant,
+                description = description,
+                recipient = recipient,
+                date = date,
+            )
+            new_expense_entry.save()
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'amount': amount,
+                    'category': category,
+                    'merchant': merchant,
+                    'description': description,
+                    'recipient': recipient,
+                    'date': date,
+                }
+            }), 200
+        except Exception as e:
+            return jsonify({
+                'status': 'error',
+                'message': f"Failed to create expenses; {str(e)}"
+            }), 500
+
+
+
 
     def view_expenses(self, user_identity):
-        pass
+        try:
+            email = user_identity
+            if not email:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Not authorized to access this service'
+                }), 400
+
+            user = User.objects(email=email).first()
+
+            expenses = Expenses.objects()
+
+            expenses_entry = [
+                {
+                    'amount': expense.amount,
+                    'category': expense.category,
+                    'merchant': expense.merchant,
+                    'description': expense.description,
+                    'recipient': expense.recipient,
+                    'date': expense.date,
+                }
+                for expense in expenses
+            ]
+
+            return jsonify({
+                "status": "success",
+                "data": expenses_entry
+            }), 200
+
+
+
+        except Exception as e:
+            return jsonify({
+                    'status': 'error',
+                    'message': f"Failed to get expenses; {str(e)}"
+                }), 500
+
 
     def add_category(self, user_identity, data):
         email = user_identity
@@ -102,6 +179,7 @@ class UserService(UserServiceInterface):
                 'status': 'error',
                 'message': f"Failed to add category; {str(e)}"
             }), 500
+
 
 
     def view_categories(self, user_identity):

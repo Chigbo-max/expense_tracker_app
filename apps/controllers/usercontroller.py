@@ -30,3 +30,20 @@ def view_categories():
     return user_service.view_categories(user_identity)
 
 
+@user_view.route('/create-expenses', methods=['POST'])
+@jwt_required()
+def create_expenses():
+    user_identity = get_jwt_identity()
+    data = request.get_json()
+    return user_service.create_expenses(user_identity, data)
+
+
+@user_view.route('/view-expenses', methods=['GET'])
+@jwt_required()
+def view_expenses():
+    user_identity = get_jwt_identity()
+    return user_service.view_expenses(user_identity)
+
+
+
+
