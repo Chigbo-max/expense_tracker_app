@@ -16,7 +16,7 @@ class AdminServiceInterface(ABC):
         pass
 
     @abstractmethod
-    def view_all_users(self, data):
+    def view_all_users(self):
         pass
 
     @abstractmethod

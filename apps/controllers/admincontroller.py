@@ -22,4 +22,11 @@ def add_category():
 def remove_category(name):
     return admin_service.remove_default_categories(name.lower())
 
+@admin_view.route('/admin/view-all-users', methods=['GET'])
+@admin_required
+@jwt_required()
+def view_all_users():
+    return admin_service.view_all_users()
+
+
 

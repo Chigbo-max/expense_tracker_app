@@ -16,8 +16,36 @@ class AdminService(AdminServiceInterface):
     def activate_account(self, data):
         pass
 
-    def view_all_users(self, data):
-        pass
+    def view_all_users(self):
+        try:
+            users = User.objects.all()
+
+            if users is None:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'No users found'
+                }), 400
+
+            user_list = [
+                {
+                    "id": str(user.id),
+                    "email": str(user.email),
+                    "role": user.role,
+                    "status": str(user.status.value),
+                    "created_at": user.created_at,
+                }
+                for user in users
+            ]
+            return jsonify({
+                "status": "success",
+                "data": user_list
+            }), 200
+
+        except Exception as e:
+            return jsonify({
+                "status": "error",
+                "message": f"Failed to get all users: {e}"
+            }), 500
 
     def add_default_categories(self, data):
 

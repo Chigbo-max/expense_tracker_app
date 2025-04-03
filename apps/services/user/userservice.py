@@ -142,7 +142,6 @@ class UserService(UserServiceInterface):
             }), 200
 
 
-
         except Exception as e:
             return jsonify({
                     'status': 'error',
