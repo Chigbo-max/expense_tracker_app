@@ -22,4 +22,8 @@ class UserServiceInterface(ABC):
     @abstractmethod
     def view_categories(self, user_identity):
         pass
+    @abstractmethod
+    def update_budget(self, user_identity, data):
+        pass
+
 

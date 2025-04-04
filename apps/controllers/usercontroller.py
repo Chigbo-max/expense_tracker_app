@@ -44,6 +44,14 @@ def view_expenses():
     user_identity = get_jwt_identity()
     return user_service.view_expenses(user_identity)
 
+@user_view.route('/update-budget', methods=['PATCH'])
+@jwt_required()
+def update_budget():
+    user_identity = get_jwt_identity()
+    data = request.get_json()
+    return user_service.update_budget(user_identity, data)
+
+
 
 
 

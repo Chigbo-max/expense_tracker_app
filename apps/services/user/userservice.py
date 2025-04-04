@@ -40,6 +40,7 @@ class UserService(UserServiceInterface):
                 limit = data['limit'],
                 month = data.get('month', datetime.now().month),
                 year = data.get('year', datetime.now().year),
+                rollover_enabled = bool(data.get('rollover_enabled', False)),
             ).save()
 
             return jsonify({
@@ -61,6 +62,52 @@ class UserService(UserServiceInterface):
             }), 500
 
 
+    def update_budget(self, user_identity, data):
+        email = user_identity
+
+        try:
+            user = User.objects(email=email).first()
+
+            if user is None:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'User not found'
+                }), 400
+
+            budget = Budget.objects(user=user).first()
+            if not budget:
+                return jsonify({
+                    "status": "error",
+                    "message": "Not budget found"''
+                }), 400
+
+            updates={
+                'set__last_updated': datetime.now(),
+            }
+            if 'limit' in data:
+                updates['set__limit'] = float(data['limit'])
+            if 'rollover_enabled' in data:
+                updates['set__rollover_enabled'] = bool(data['rollover_enabled'])
+
+            if updates:
+                budget.update(**updates)
+                budget.reload()
+
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'updated_limit': budget.limit,
+                    'updated_rollover_enabled': budget.rollover_enabled,
+                    'last_updated': budget.last_updated,
+                    'message': 'budget updated successfully'
+                }
+            }), 200
+
+        except Exception as e:
+            return jsonify({
+                'status': 'error',
+                'message':f'Failed to updated budget{str(e)}'
+            }), 500
 
 
     def create_expenses(self, user_identity, data):
