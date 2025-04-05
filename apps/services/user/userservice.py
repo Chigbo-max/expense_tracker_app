@@ -72,7 +72,7 @@ class UserService(UserServiceInterface):
                 return jsonify({
                     'status': 'error',
                     'message': 'User not found'
-                }), 400
+                }), 404
 
             budget = Budget.objects(user=user).first()
             if not budget:
@@ -106,9 +106,55 @@ class UserService(UserServiceInterface):
         except Exception as e:
             return jsonify({
                 'status': 'error',
-                'message':f'Failed to updated budget{str(e)}'
+                'message':f'Failed to update budget{str(e)}'
             }), 500
 
+
+    def get_budget(self, user_identity):
+
+        try:
+            email = user_identity
+            user = User.objects(email=email).first()
+            if not user:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'User not found'
+                }), 404
+
+            current_month = datetime.now().month
+            current_year = datetime.now().year
+
+            budgets = Budget.objects(user=user, month=current_month, year=current_year).all()
+
+            if not budgets:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'No budget found'
+                }), 400
+
+            budget_list = [
+                {
+
+                    'category' : budget.category,
+                    'limit' : budget.limit,
+                    'current_spending' : budget.current_spending or 0.0,
+                    'month' : budget.month,
+                    'year' : budget.year,
+
+                 }
+            for budget in budgets
+            ]
+
+            return jsonify({
+                'status': 'success',
+                'message': budget_list
+            }), 200
+        except Exception as e:
+            print(traceback.format_exc())
+            return jsonify({
+                'status': 'error',
+                'message':f'Failed to get budget{str(e)}'
+            })
 
     def create_expenses(self, user_identity, data):
         email = user_identity
@@ -138,6 +184,30 @@ class UserService(UserServiceInterface):
                 date = date,
             )
             new_expense_entry.save()
+
+
+            expense_month = datetime.now().month
+            expense_year = datetime.now().year
+            budget = Budget.objects(user=user, category=category, month=expense_month, year=expense_year).first()
+            if budget:
+                if budget.current_spending is None:
+                    budget.update(set__current_spending = 0.0)
+                    budget.reload()
+                budget.update(inc__current_spending = amount)
+                budget.reload()
+                if budget.current_spending > budget.limit:
+                    print(f"{budget.current_spending} is above limit for {expense_month},{expense_year} : {budget.limit}, category: {category}")
+
+                    from app import celery
+
+                    celery.tasks['apps.services.tasks.send_budget_exceeded_notification'].delay(
+                        email=user_identity,
+                        category=category,
+                        limit=budget.limit,
+                        current_spending=budget.current_spending
+                    )
+
+
             return jsonify({
                 'status': 'success',
                 'data': {
@@ -150,6 +220,7 @@ class UserService(UserServiceInterface):
                 }
             }), 200
         except Exception as e:
+            print(traceback.format_exc())
             return jsonify({
                 'status': 'error',
                 'message': f"Failed to create expenses; {str(e)}"

@@ -26,4 +26,8 @@ class UserServiceInterface(ABC):
     def update_budget(self, user_identity, data):
         pass
 
+    @abstractmethod
+    def get_budget(self, user_identity):
+        pass
+
 

@@ -5,13 +5,15 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from mongoengine import connect
 
+from app import celery
 from apps.data.model.user import User
 from apps.services.user.userservice import UserService
 
 
 class TestUserService(TestCase):
-    pass
 
+
+   pass
     # @classmethod
     # def setUpClass(cls):
     #     cls.app = Flask(__name__)

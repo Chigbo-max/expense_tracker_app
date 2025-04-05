@@ -52,6 +52,14 @@ def update_budget():
     return user_service.update_budget(user_identity, data)
 
 
+@user_view.route('/get-budget', methods=['GET'])
+@jwt_required()
+def get_budget():
+    user_identity = get_jwt_identity()
+    return user_service.get_budget(user_identity)
+
+
+
 
 
 
