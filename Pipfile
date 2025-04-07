@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 mongomock = "*"
+cors = "*"
 
 [dev-packages]
 

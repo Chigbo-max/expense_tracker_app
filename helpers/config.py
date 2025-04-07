@@ -11,6 +11,8 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
     MONGO_URI = os.environ.get('MONGO_URI')
     FRONTEND_URI = os.environ.get('FRONTEND_URI')
+    MONGO_HOST = '192.168.0.168'
+    MONGO_PORT = 27017
 
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'

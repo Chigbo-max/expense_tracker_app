@@ -1,5 +1,5 @@
 
-from app import celery
+from helpers.celerysetup import celery
 from apps.data.model.user import User
 from apps.services.notificationadapter import NotificationAdapter
 from apps.services.rollover import RollOverService
